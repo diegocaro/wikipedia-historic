@@ -1,1 +1,1 @@
-cut -f 1 | uniq | gsort -u
+cut -f 1 | uniq

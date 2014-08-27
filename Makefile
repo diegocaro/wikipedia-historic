@@ -4,8 +4,7 @@ DIR_TITLES=$(DIR_DATA)/titles
 DIR_GRAPHS=$(DIR_DATA)/graphs
 
 FILE_FINALTITLES=$(DIR_DATA)/alltitles.txt
-DIR_FINALGRAPHS=./finalgraphs
-DIR_SRTGRAPHS=$(DIR_DATA)/srtgraphs
+DIR_CHGGRAPHS=$(DIR_DATA)/chggraphs
 
 DIR_LOGS=./logs
 
@@ -31,5 +30,6 @@ stage2:
 	@echo "STAGE2: Collect all pages' titles"
 	@cat $(DIR_TITLES)/*.txt | gsort -u > $(FILE_FINALTITLES)
 
-sort:
-	ls $(DIR_GRAPHS)/*gz | $(PARALLEL) --eta -P $(PROCS) 'gzcat {} | sort -k1,1 -k2,2 -n | gzip > $(DIR_SRTGRAPHS)/{/.}.gz'
+stage3:
+	@echo "STAGE3: Sort graphs and get a collection of changes"
+	@ls $(DIR_GRAPHS)/*gz | $(PARALLEL) --eta -P $(PROCS) 'gzcat {} | gsort -k1,1 -k2,2 -n | $(PYTHON) changes.py $(FILE_FINALTITLES) | gzip > $(DIR_CHGGRAPHS)/{/.}.gz '
