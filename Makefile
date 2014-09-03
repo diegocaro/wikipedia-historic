@@ -5,6 +5,8 @@ DIR_GRAPHS=$(DIR_DATA)/graphs
 
 FILE_FINALTITLES=$(DIR_DATA)/alltitles.txt
 DIR_CHGGRAPHS=$(DIR_DATA)/chggraphs
+DIR_CONTACTS=$(DIR_DATA)/contacts
+FILE_MINMAXTIME=$(DIR_DATA)/minmaxtime.txt
 
 DIR_LOGS=./logs
 
@@ -33,3 +35,11 @@ stage2:
 stage3:
 	@echo "STAGE3: Sort graphs and get a collection of changes"
 	@ls $(DIR_GRAPHS)/*gz | $(PARALLEL) --eta -P $(PROCS) 'gzcat {} | gsort -k1,1 -k2,2 -n | $(PYTHON) changes.py $(FILE_FINALTITLES) | gzip > $(DIR_CHGGRAPHS)/{/.}.gz '
+	
+stage4:
+	@echo "STAGE4: Obtain the min and max timepoint"
+	@ls $(DIR_CHGGRAPHS)/*gz | $(PARALLEL) --eta -P $(PROCS) 'gzcat {} | awk -f time.awk' | awk -f time.awk | cut -f3 -d " " > $(FILE_MINMAXTIME)
+	
+stage5:
+	@echo "STAGE5: Generating contacts"
+	@ls $(DIR_CHGGRAPHS)/*gz | $(PARALLEL) --eta -P $(PROCS) 'gzcat {} | gsort -k1,1 -k2,2 -n | $(PYTHON) contacts.py `head -n1 $(FILE_MINMAXTIME)` `tail -n1 $(FILE_MINMAXTIME)` | gzip > $(DIR_CONTACTS)/{/.}.gz'
