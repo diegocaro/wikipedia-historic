@@ -1,10 +1,10 @@
 DIR_DATA=./data
 DIR_FILES7Z=$(DIR_DATA)/files7z
 DIR_TITLES=$(DIR_DATA)/titles
-DIR_GRAPHS=$(DIR_DATA)/graphs
+DIR_GRAPHS=$(DIR_DATA)/graphs #titulo, tiempo -> vecinos activos de <titulo> en <tiempo>
 
 FILE_FINALTITLES=$(DIR_DATA)/alltitles.txt
-DIR_CHGGRAPHS=$(DIR_DATA)/chggraphs
+DIR_CHGGRAPHS=$(DIR_DATA)/chggraphs #idtitle idneighbor timewherechanges
 DIR_CONTACTS=$(DIR_DATA)/contacts
 FILE_MINMAXTIME=$(DIR_DATA)/minmaxtime.txt
 
@@ -34,7 +34,7 @@ stage2:
 
 stage3:
 	@echo "STAGE3: Sort graphs and get a collection of changes"
-	@ls $(DIR_GRAPHS)/*gz | $(PARALLEL) --eta -P $(PROCS) 'gzcat {} | gsort -k1,1 -k2,2 -n | $(PYTHON) changes.py $(FILE_FINALTITLES) | gzip > $(DIR_CHGGRAPHS)/{/.}.gz '
+	@ls $(DIR_GRAPHS)/*gz | $(PARALLEL) --eta -P $(PROCS) 'gzcat {} | gsort -k1,1 -k2,2n | $(PYTHON) changes.py $(FILE_FINALTITLES) | gzip > $(DIR_CHGGRAPHS)/{/.}.gz '
 	
 stage4:
 	@echo "STAGE4: Obtain the min and max timepoint"
